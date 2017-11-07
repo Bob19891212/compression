@@ -232,3 +232,45 @@ void compressDataAndExportToFile(float ** pSrcArr,
     printf("数据压缩的时间为：%fs\n",compressionTime);
 }
 
+void importDataFromFileAndDecompress(float ** pDestArr, char * dir)
+{
+    srand((unsigned)time( NULL ));          //初始化随机数(解压数据小数部分随机生成)
+
+    DIR * pDir;                             //定义文件目录指针
+    struct dirent * file;                   //定义结构体文件指针
+
+    unsigned char cacheArr[LENGTH];         //缓存数组(缓存文件中的数据)
+
+    clock_t startTime, finishTime;          //声明变量程序开始时间与结束时间
+    double decompressionTime;               //声明变量程序解压缩时间
+
+    startTime = clock();                    //获取解压缩开始时间
+
+    if ( (pDir = opendir(dir)) != NULL )    //判断目录是否被打开
+    {
+        while ( (file = readdir(pDir)) != NULL )  //判断文件内容是否被读取到内存中
+        {
+            //跳过目录下的"."和".."的隐藏目录
+            if( strcmp(file->d_name,".") == 0 || strcmp(file->d_name,"..") == 0)
+            {
+                continue;
+            }
+
+            //将读取的文件数据存储到缓存数组中
+            importByteFromFile(file,cacheArr,dir);
+
+            //将缓存数组数据解压到浮点型数组中
+            decompressArray(file,cacheArr,pDestArr);
+        }
+    }
+    else
+    {
+        printf("无法打开目录 %s\n",dir);      //如果没打开,输出错误信息
+    }
+
+    finishTime = clock();                   //获取解压缩结束时间
+    //计算解压缩时间,并在终端上显示
+    decompressionTime = (double)(finishTime - startTime) / CLOCKS_PER_SEC;
+    printf("数据解压缩的时间为：%fs\n",decompressionTime);
+}
+

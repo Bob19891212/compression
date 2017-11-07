@@ -134,6 +134,13 @@ void compressDataAndExportToFile(float ** pSrcArr,
                                  int arrayCnt,
                                  char * pPrefix);
 
+/*
+*  @brief  读取指定目录的文件,将文件数据存入到内存中,再通过表头数据解压数据
+*  @param  pDestArr: 双重浮点型指针数组，指向数据解压后存放数组的头指针
+*          dir :  文件目录 char 型指针,指向需要读取数据的文件目录
+*  @return N/A
+*/
+void importDataFromFileAndDecompress(float ** pDestArr, char * dir);
 
 //<<<----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
