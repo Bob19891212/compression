@@ -22,6 +22,34 @@ int findMaxFromArr(float srcArr[],int length)
     return (int)max;                  //将浮点型最大值转换为int型返回
 }
 
+void calcDiff(float **origSrcArr,
+              float **latestSrcArr,
+              float **destArr,
+              int arrayLenArr[],
+              int arrayCnt)
+{
+    //依次轮询每个数组,进行差值比较
+    for (int i = 0; i < arrayCnt; ++i)
+    {
+        //开辟当前数组差值的存放空间
+        destArr[i] = (float *) malloc (sizeof(float) * arrayLenArr[i]);
+
+        //如果开辟空间成功,则将数据存储到数组中,否则输出错误提示
+        if(NULL != destArr[i])
+        {
+            //依次轮询数组中,每个元素,计算出差值,并保存至差值数组中
+            for (int j = 0; j < arrayLenArr[i]; ++j)
+            {
+                 destArr[i][j] =latestSrcArr[i][j] - origSrcArr[i][j];
+            }
+        }
+        else
+        {
+            printf("存放差值数据时,开辟空间失败");
+        }
+    }
+}
+
 void mapFloatArrToByteArr(int max,
                           int min,
                           float *srcArr,
