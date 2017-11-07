@@ -46,7 +46,6 @@ void mapFloatArrToByteArr(int max,
                          (BYTE_MAX_VALUE * (tempMapValue -min) / (max - min));
         }
     }
-
 }
 
 
@@ -86,6 +85,36 @@ void exportByteToFile(char *pFilePath,
         perror("打开文件错误!");
     }
     close(file);                      //关闭文件
+}
+
+void importByteFromFile(struct dirent * file,
+                        unsigned char destArr[],
+                        char * dir)
+{
+    char filePath[NAME_CHAR_CNT];
+
+    //通过文件名获取打开文件的路径
+    sprintf(filePath ,"%s%s" ,dir ,file->d_name);
+
+    //打开指定路径的文件,打开权限为只读,每次读入缓冲区的长度为10000
+    int fileDir = open(filePath,O_RDONLY,LENGTH);
+
+    if(fileDir != -1)                    //判断文件目录是否被打开
+    {
+        //读取文件指定长度数据,并将文件中实际的数据存入到目标数组中
+        int fileSize = read(fileDir,destArr,LENGTH);
+
+        if (fileSize <= 0)               //如果文件长度小于等于0,则说明文件读取错误
+        {
+            perror("读取文件错误 !");
+        }
+    }
+    else                                 //如果文件没有被打开,则输出错误提示
+    {
+        perror("打开文件目录错误 !");       //如果文件目录没有被打开,则输出错误提示
+    }
+
+    close(fileDir);
 }
 
 void deleteFile(char * dir)
