@@ -69,6 +69,58 @@ void compressArray(float srcArr[],
     mapFloatArrToByteArr(max,min,srcArr,&destArr[HEADER_LEN],length);
 }
 
+void decompressArray(struct dirent *file,
+                     unsigned char srcArr[],
+                     float **pDestArr)
+{
+    int arrayCnt = (int)srcArr[0];      //获取当前文件中数组的个数
+    int accumulatedLen = 0;             //累计长度(方便取出存放多个数组的头指针)
+    int max , min;                      //数组中的最大值与最小值
+    int arrayLen;                       //需要解压数组的长度
+    int arrayIdx;                       //解压后数据存放的数组的索引号
+    int nameStrLen = 8;                 //单个文件名的字符数("_chipxxx"共8位)
+
+    //依次轮询文件中每个数组
+    //获取数组的索引号,数组长度,数组的最大值,最小值
+    //根据数组的长度开辟存放解压数据的内存空间
+    //再根据最大值与最小值,解压出 float 数组中每个元素的数据
+    for (int i = 0; i < arrayCnt; ++i)
+    {
+        //计算数组的索引号
+        arrayIdx = (file->d_name[4 + i * nameStrLen] - '0') * 100 +
+                   (file->d_name[5 + i * nameStrLen] - '0') * 10 +
+                   (file->d_name[6 + i * nameStrLen] - '0');
+        //计算解压数组的长度
+        arrayLen = (int)srcArr[1 + accumulatedLen] * RATIO_FACTOR +
+                   (int)srcArr[2 + accumulatedLen];
+        //计算解压数组的最大值,与最小值
+        max = (int)srcArr[3 + accumulatedLen] * RATIO_FACTOR +
+              (int)srcArr[4 + accumulatedLen];
+        min = (int)srcArr[5 + accumulatedLen] * RATIO_FACTOR +
+              (int)srcArr[6 + accumulatedLen];
+
+        //开辟存放解压数据(float)的存放空间
+        pDestArr[arrayIdx] = (float *) malloc (sizeof(float) * arrayLen);
+
+        if (NULL != pDestArr[arrayIdx] )
+        {
+            //将缓存数组中数据解压至 目标数组 (float)中
+            mapByteArrToFloatArr(max,
+                                 min,
+                                 &srcArr[accumulatedLen + HEADER_LEN + 1],
+                                 pDestArr[arrayIdx],
+                                 arrayLen);
+
+            //计算已经解压数组的长度(目的是为了取出一个文件中存放多个数组的头指针)
+            accumulatedLen += (arrayLen + HEADER_LEN);
+        }
+        else
+        {
+            printf("解压数据时,开辟空间失败!");
+        }
+    }
+}
+
 void exportByteToFile(char *pFilePath,
                       unsigned char srcArr[],
                       int length)
