@@ -48,6 +48,29 @@ void mapFloatArrToByteArr(int max,
     }
 }
 
+void mapByteArrToFloatArr(int max,
+                          int min,
+                          unsigned char srcArr[],
+                          float * destArr,
+                          int arrayLen)
+{
+    //判断最大值与最小值是否相等,如果相等则程序错误
+    if ( max == min )
+    {
+        printf("数组的最大值与最小值相等,无法解压数据!");
+    }
+    else
+    {
+        // 轮询映射数组中的每个数据
+        for (int i = 0; i < arrayLen; ++i)
+        {
+            //数组中的数据根据最大值与最小值,将Byte型数据还原成浮点型数据
+            destArr[i] = (float)
+                         ((srcArr[i]) * (max - min) / BYTE_MAX_VALUE + min) +
+                         GET_ACCURACY ;
+        }
+    }
+}
 
 void compressArray(float srcArr[],
                    unsigned char destArr[],
