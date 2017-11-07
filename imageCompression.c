@@ -70,6 +70,23 @@ void compressArray(float srcArr[],
     mapFloatArrToByteArr(max,min,srcArr,&destArr[HEADER_LEN],length);
 }
 
+void exportByteToFile(char *pFilePath,
+                      unsigned char srcArr[],
+                      int length)
+{
+    //创建文件，给文件只写的权限，并打开
+    int file = open(pFilePath, O_WRONLY | O_CREAT,0777);
+
+    if(file != -1)                    //判断文件是否打开，如果打开，则写入数据至文件
+    {
+        write(file, srcArr, length);  //根据数组长度，将数组数据写入文件（二进制格式）
+    }
+    else                              //如果文件打开失败，则输出错误信息
+    {
+        perror("打开文件错误!");
+    }
+    close(file);                      //关闭文件
+}
 
 void deleteFile(char * dir)
 {
