@@ -160,6 +160,22 @@ void importByteFromFile(struct dirent * file,
                         char * dir);
 
 /*
+*  @brief   将浮点行数组中的数据写入指定目录中,每一个数组将生成一个文件
+*           (文件名由前缀+索引号+后缀组成,如(chip001_diff))
+*  @param   srcArr: 双重指针,为需要写入至文件数据数组的头指针
+*           arrayLenArr: 存放数组长度的整型数组
+*           arrayCnt: 需要写入至文件数组的个数
+*           dir: 文件存放的目录
+*           prefix: 文件名的前缀
+*  @return
+*/
+void exportFloatToFile(float ** srcArr,
+                       int arrayLenArr[],
+                       int arrayCnt,
+                       char * dir,
+                       char * prefix);
+
+/*
 *  @brief   删除指定目录下的所有文件
 *           (当存放文件的目录下文件已存在,则先删除目录下的所有文件,再进行文件存储)
 *  @param   dir:文件目录名(要删除文件所在的目录)

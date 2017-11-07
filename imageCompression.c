@@ -220,6 +220,50 @@ void importByteFromFile(struct dirent * file,
     close(fileDir);
 }
 
+void exportFloatToFile(float ** srcArr,
+                       int arrayLenArr[],
+                       int arrayCnt,
+                       char * dir,
+                       char * prefix)
+{
+    if(access(dir, 0) == 0)      //判断文件目录是否存在,如果存在,删除目录中的所有文件
+    {
+        deleteFile(dir);
+    }
+    else                                                //如果目录不存在则创建目录
+    {
+        mkdir( dir, 0777);                              //生成存放压缩数据的目录
+    }
+
+    FILE *pFile = NULL;                                 //定义文件流指针
+
+    char filePath[NAME_CHAR_CNT];                       //存放文件路径的数组
+    char suffix[5] = "_diff";                           //文件名的后缀
+
+    for(int i=0; i<arrayCnt; ++i)
+    {
+        //给文件路径赋值,文件路径有目录+前缀+索引号+后缀组成,如(./dataDiff/chip001_diff)
+        sprintf(filePath,"%s%s%03d%s",dir,prefix,i,suffix);
+
+        pFile = fopen(filePath,"a+"); //打开指定路径的文件,并给予文件写的权限
+
+        if (NULL != pFile)  //如果文件流指针不为NULL(文件被打开),则将数组数据写入文件
+        {
+            //将数组数据写入文件
+            for(int j=0; j < arrayLenArr[i]; j++)
+            {
+                fprintf(pFile,"  %.2f",srcArr[i][j]);
+            }
+            fclose(pFile);
+        }
+        else                //如果文件没有被打开,则输出错误提示
+        {
+            printf("写入对比数据差值时,打开文件错误!!");
+        }
+    }
+
+}
+
 void deleteFile(char * dir)
 {
     char filePath[NAME_CHAR_CNT];            //存放文件路径的byte数组
