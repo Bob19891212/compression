@@ -1,5 +1,76 @@
 #include "imagecompression.h"
 
+int findMinFromArr(float srcArr[],int length)
+{
+    float min = srcArr[0];            //将数组的第一个元素赋值给最小值
+    for (int i = 1; i < length; ++i)  //轮询数组中元素,分别将数组中每个元素与最小值比较
+    {
+        if( min > srcArr[i])          //如果数组中的元素比最小值小
+            min = srcArr[i];          //将此元素的值赋值给最小值
+    }
+    return (int)min;                  //将浮点型最小值转换为int型返回
+}
+
+int findMaxFromArr(float srcArr[],int length)
+{
+    float max = srcArr[0];            //将数组的第一个元素赋值给最大值
+    for (int i = 1; i < length; ++i)  //轮询数组中元素,分别将数组中每个元素与最大值比较
+    {
+        if( max < srcArr[i])          //如果数组中的元素比最小值大
+            max = srcArr[i];          //将此元素的值赋值给最大值
+    }
+    return (int)max;                  //将浮点型最大值转换为int型返回
+}
+
+void mapFloatArrToByteArr(int max,
+                          int min,
+                          float *srcArr,
+                          unsigned char destArr[],
+                          int arrayLen)
+{
+    int tempMapValue;                       //临时映射值,将数组中浮点型数据转换成整型
+
+    //判断最大值与最小值是否相等,如果相等则程序错误
+    if ( max == min )
+    {
+        printf("数组的最大值与最小值相等,无法压缩数据!");
+    }
+    else
+    {
+        //轮询数组中每个元素,将其映射到Byte型数组中
+        for (int i = 0; i < arrayLen; ++i)
+        {
+            tempMapValue = (int)(srcArr[i]);    //将数组中的浮点型数据转换成整型
+            //通过公式计算出数据映射后的结果,存入目标数组中
+            destArr[i] = (unsigned char)
+                         (BYTE_MAX_VALUE * (tempMapValue -min) / (max - min));
+        }
+    }
+
+}
+
+
+void compressArray(float srcArr[],
+                   unsigned char destArr[],
+                   int length)
+{
+    int max = findMaxFromArr(srcArr,length);  //获取数组中的最大值
+    int min = findMinFromArr(srcArr,length);  //获取数组中的最小值
+
+    //将数组的长度除以压缩系数取值(压缩系数:100,使结果在0-255范围内,下同),存入Byte数组中
+    destArr[0] = (unsigned char)(length / RATIO_FACTOR);
+    //将数组的长度除以压缩系数取余数,存入Byte数组中
+    destArr[1] = (unsigned char)(length % RATIO_FACTOR);
+    destArr[2] = (unsigned char)(max / RATIO_FACTOR); //将最大值压缩至Byte数组
+    destArr[3] = (unsigned char)(max % RATIO_FACTOR);
+    destArr[4] = (unsigned char)(min / RATIO_FACTOR); //将最小值压缩至Byte数组
+    destArr[5] = (unsigned char)(min % RATIO_FACTOR);
+
+    //根据最大值,最小值,将浮点型数组元素映射到Byte数组中
+    mapFloatArrToByteArr(max,min,srcArr,&destArr[HEADER_LEN],length);
+}
+
+
 void deleteFile(char * dir)
 {
     char filePath[NAME_CHAR_CNT];            //存放文件路径的byte数组
